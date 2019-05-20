@@ -1,0 +1,24 @@
+version: '2.1'
+
+services:
+  {{ inventory_hostname }}:
+    image: {{docker_registry}}/pixar/elasticsearch:{{version_elasticsearch}}
+    container_name: {{ inventory_hostname }}
+    restart: always
+    volumes:
+      - {{ applis_conf_dir }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - {{ applis_certs_dir }}/{{ ansible_hostname | lower }}.crt:/usr/share/elasticsearch/config/{{ ansible_hostname | lower }}.crt
+      - {{ applis_certs_dir }}/{{ ansible_hostname | lower }}.key:/usr/share/elasticsearch/config/{{ ansible_hostname | lower }}.key
+      - {{ applis_data_dir }}:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms{{ ansible_memtotal_mb // 2 }}m -Xmx{{ ansible_memtotal_mb // 2 }}m"
+      - XPACK_MONITORING_ENABLED=true
+      - ELASTIC_PASSWORD={{ xpack_pass }}
