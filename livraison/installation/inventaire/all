@@ -1,0 +1,78 @@
+---
+projet: "elk"
+
+### Map de définition des services du projet
+## il doit y avoir cohérence avec les nom utilisés dans le site.yml et ceux déclarés dans le handler du role service (/roles/service/handlers/main.yml)
+services_def:
+  elasticsearch:
+    nom: "elasticsearch.service"
+    composeFile: "docker-compose-elasticsearch.yml"
+  logstash:
+    nom: "logstash.service"
+    composeFile: "docker-compose-logstash.yml"
+  kibana: 
+    nom: "kibana.service"
+    composeFile: "docker-compose-kibana.yml"
+  loadbalancer: 
+    nom: "loadbalancer.service"
+    composeFile: "docker-compose-loadbalancer.yml"
+
+# Utilisateur projet
+user_projet: "{{ projet }}"
+group_projet: "{{ projet }}"
+uid_projet: "1000"
+gid_projet: "1000"
+
+# Utilisateur admin. Modifier à vos risques et périls :)
+user_admin: "root"
+group_admin: "docker"
+
+# Configuration docker
+projet_docker: true
+
+# skip_pull => true : ne télécharge pas les images sur le serveur. Utile pour l'intégration continue, car l'image est construite directement sur la machine et non publiée
+# A activer sur l'inventory correspondant à la machine d'intégration continue ou dev.
+skip_pull: false
+
+#docker_registry: "app.inca.rte-france.com"
+
+# Variables ELK
+nom_es_cluster_recherche: "{{ projet }}-recherche-prod"
+applis_conf_dir: "/applis/{{ projet }}/config"
+applis_data_dir: "/applis/{{ projet }}/data"
+applis_logs_dir: "/applis/{{ projet }}/logs"
+applis_certs_dir: "/applis/{{ projet }}/certs"
+applis_pipeline_dir: "/applis/{{ projet }}/pipeline"
+es_conf_file: elasticsearch.yml
+ls_conf_file: logstash.yml
+kbn_conf_file: kibana.yml
+
+# Comptes ELK initiaux dont il faut définir le mot de passe
+# Liste simple, pas besoin de valeurs
+elk_accounts_init:
+  - logstash_system
+  - kibana
+
+# Comptes ELK à créer
+# Liste de dictionnaires, car une valeur est nécessaire (role)
+elk_accounts_create:
+  - name: remote_monitor
+    role: remote_monitoring_agent
+  - name: stack_monitor
+    role: monitoring_user
+
+# Variables kernel
+max_map_count: 262144
+
+# Authentification X-pack
+xpack_user : elastic
+
+# Variables Loadbalancer
+#ip_virtuelle:
+
+# Versions des images Docker
+version_elasticsearch: "6.5.1-build37"
+version_logstash: "6.5.1-build37"
+version_kibana: "6.5.1-build37"
+version_haproxy: "1.7-build19"
+...
