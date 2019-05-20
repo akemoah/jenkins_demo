@@ -1,2 +1,5 @@
 ---
-# handlers file for deploiement-elasitcsearch-docker
+# Handlers
+
+- name: reload kernel parameters
+  command: /usr/sbin/sysctl --quiet --system
