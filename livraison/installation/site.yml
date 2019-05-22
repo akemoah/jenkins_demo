@@ -1,0 +1,52 @@
+# ici on specifie : sur toutes les machines de l'application les rôles à jouer (ex sanity-check, common, service )
+- hosts: 
+  roles:
+    - common/sanity-check
+    - common/rollback/applicatif/create-savepoint
+    - common/installation
+
+# ROLES PROJET
+- hosts: elasticsearch
+  roles:
+  - remplacement-password
+  - deploiement-elasticsearch-docker
+
+#- hosts: logstash
+#  roles:
+#  - remplacement-password
+# - deploiement-logstash-docker
+
+#- hosts: kibana
+#  roles:
+#  - remplacement-password
+#  - deploiement-kibana-docker
+
+#- hosts: loadbalancer
+#  roles:
+#  - remplacement-password
+#  - deploiement-haproxy-docker
+
+# ROLES PROJET
+
+# Activation de la nouvelle version et démarrage des services
+- hosts: pixar
+  roles:
+    - common/activation
+
+- hosts: elasticsearch
+  roles:
+    - { role: service, services: ["elasticsearch"] }
+
+#- hosts: logstash
+#  roles:
+#    - remplacement-password
+#    - injection-info-comptes
+#    - { role: service, services: ["logstash"] }
+
+#- hosts: kibana
+#  roles:
+#    - { role: service, services: ["kibana"] }
+
+#- hosts: loadbalancer
+#  roles:
+#    - { role: service, services: ["loadbalancer"] }
